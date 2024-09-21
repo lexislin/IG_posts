@@ -1,31 +1,44 @@
 import pandas as pd
 import streamlit as st
+import matplotlib.pyplot as plt
 
 # Load the rankings from the Excel file
 data_file = 'pos_rankings.xlsx'
-
-# Read the data for nouns, verbs, and adjectives from separate sheets
 df_nouns = pd.read_excel(data_file, sheet_name='Nouns')
 df_verbs = pd.read_excel(data_file, sheet_name='Verbs')
 df_adjectives = pd.read_excel(data_file, sheet_name='Adjectives')
 
 # Streamlit Display
 st.title("Instagram Post Analysis with POS Tagging")
-st.subheader("Top Nouns")
-st.dataframe(df_nouns)
 
-st.subheader("Top Verbs")
-st.dataframe(df_verbs)
+# Toggle selection for charts
+option = st.selectbox("Select the type of chart to display:", ['Top Nouns', 'Top Verbs', 'Top Adjectives'])
 
-st.subheader("Top Adjectives")
-st.dataframe(df_adjectives)
+if option == 'Top Nouns':
+    st.subheader("Top Nouns")
+    st.bar_chart(df_nouns.set_index('Nouns')['Count'])
+elif option == 'Top Verbs':
+    st.subheader("Top Verbs")
+    st.bar_chart(df_verbs.set_index('Verbs')['Count'])
+elif option == 'Top Adjectives':
+    st.subheader("Top Adjectives")
+    st.bar_chart(df_adjectives.set_index('Adjectives')['Count'])
 
-# Optional: Add interactivity
-selected_noun = st.selectbox("Select a Noun", df_nouns['Nouns'])
-st.write(f"You selected: {selected_noun}")
+# Display the underlying data in a table
+st.subheader("Data Table")
+if option == 'Top Nouns':
+    st.dataframe(df_nouns)
+elif option == 'Top Verbs':
+    st.dataframe(df_verbs)
+elif option == 'Top Adjectives':
+    st.dataframe(df_adjectives)
 
-selected_verb = st.selectbox("Select a Verb", df_verbs['Verbs'])
-st.write(f"You selected: {selected_verb}")
+# Optional: Add a summary of the selected words
+if option == 'Top Nouns':
+    selected_word = st.selectbox("Select a Noun", df_nouns['Nouns'])
+elif option == 'Top Verbs':
+    selected_word = st.selectbox("Select a Verb", df_verbs['Verbs'])
+else:
+    selected_word = st.selectbox("Select an Adjective", df_adjectives['Adjectives'])
 
-selected_adjective = st.selectbox("Select an Adjective", df_adjectives['Adjectives'])
-st.write(f"You selected: {selected_adjective}")
+st.write(f"You selected: {selected_word}")
