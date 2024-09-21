@@ -1,11 +1,29 @@
 import nltk
+import os
 from collections import Counter
 import pandas as pd
 import streamlit as st
 
-# Download necessary NLTK data (only needs to run once)
-nltk.download('punkt')
-nltk.download('averaged_perceptron_tagger')
+# Function to ensure NLTK data is downloaded
+def download_nltk_data():
+    nltk_data_dir = os.path.expanduser('~/nltk_data')
+    if not os.path.exists(nltk_data_dir):
+        os.makedirs(nltk_data_dir)
+
+    # Check if 'punkt' is available, and download if not
+    try:
+        nltk.data.find('tokenizers/punkt')
+    except LookupError:
+        nltk.download('punkt', download_dir=nltk_data_dir)
+    
+    # Check for 'averaged_perceptron_tagger' and download if missing
+    try:
+        nltk.data.find('taggers/averaged_perceptron_tagger')
+    except LookupError:
+        nltk.download('averaged_perceptron_tagger', download_dir=nltk_data_dir)
+
+# Ensure the NLTK data is available
+download_nltk_data()
 
 # Load your Instagram post data
 data_file = 'lg_standbyme_posts.xlsx'
@@ -39,8 +57,4 @@ df_adjectives = pd.DataFrame(adjective_counts.items(), columns=['Adjective', 'Co
 # Streamlit Display
 st.title("Instagram Post Analysis with POS Tagging")
 st.subheader("Top Nouns")
-st.dataframe(df_nouns.head(10))
-st.subheader("Top Verbs")
-st.dataframe(df_verbs.head(10))
-st.subheader("Top Adjectives")
-st.dataframe(df_adjectives.head(10))
+st.data
