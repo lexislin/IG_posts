@@ -77,12 +77,4 @@ plt.imshow(wordcloud, interpolation='bilinear')
 plt.axis('off')  # Turn off axis
 st.pyplot(plt)
 
-# Optional: Add a summary of the selected words
-if option == 'Top Nouns':
-    selected_word = st.selectbox("Select a Noun", df_nouns['Nouns'].head(num_records))
-elif option == 'Top Verbs':
-    selected_word = st.selectbox("Select a Verb", df_verbs['Verbs'].head(num_records))
-else:
-    selected_word = st.selectbox("Select an Adjective", df_adjectives['Adjectives'].head(num_records))
 
-st.write(f"You selected: {selected_word}")
