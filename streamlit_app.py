@@ -2,9 +2,19 @@ import spacy
 import pandas as pd
 import streamlit as st
 from collections import Counter
+import subprocess
 
-# Load the spaCy English model
-nlp = spacy.load("en_core_web_sm")
+# Function to download the spaCy model
+def download_spacy_model():
+    try:
+        nlp = spacy.load("en_core_web_sm")
+    except OSError:
+        subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
+        nlp = spacy.load("en_core_web_sm")
+    return nlp
+
+# Download the spaCy English model dynamically
+nlp = download_spacy_model()
 
 # Load your Instagram post data
 data_file = 'lg_standbyme_posts.xlsx'
