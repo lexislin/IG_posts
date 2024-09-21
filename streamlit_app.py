@@ -1,43 +1,31 @@
-from textblob import TextBlob
 import pandas as pd
 import streamlit as st
-from collections import Counter
 
-# Load your Instagram post data
-data_file = 'lg_standbyme_posts.xlsx'
-df = pd.read_excel(data_file)
+# Load the rankings from the Excel file
+data_file = 'pos_rankings.xlsx'
 
-# Extract captions
-captions = df['Caption'].dropna().tolist()
-
-# Tokenize and POS tag the captions using TextBlob
-nouns, verbs, adjectives = [], [], []
-
-for caption in captions:
-    blob = TextBlob(caption)
-    for word, pos in blob.tags:
-        if pos.startswith("NN"):  # Nouns
-            nouns.append(word)
-        elif pos.startswith("VB"):  # Verbs
-            verbs.append(word)
-        elif pos.startswith("JJ"):  # Adjectives
-            adjectives.append(word)
-
-# Count frequencies of nouns, verbs, and adjectives
-noun_counts = Counter(nouns)
-verb_counts = Counter(verbs)
-adjective_counts = Counter(adjectives)
-
-# Convert to DataFrame for easier handling and display
-df_nouns = pd.DataFrame(noun_counts.items(), columns=['Noun', 'Count']).sort_values(by='Count', ascending=False)
-df_verbs = pd.DataFrame(verb_counts.items(), columns=['Verb', 'Count']).sort_values(by='Count', ascending=False)
-df_adjectives = pd.DataFrame(adjective_counts.items(), columns=['Adjective', 'Count']).sort_values(by='Count', ascending=False)
+# Read the data for nouns, verbs, and adjectives from separate sheets
+df_nouns = pd.read_excel(data_file, sheet_name='Nouns')
+df_verbs = pd.read_excel(data_file, sheet_name='Verbs')
+df_adjectives = pd.read_excel(data_file, sheet_name='Adjectives')
 
 # Streamlit Display
-st.title("Instagram Post Analysis with POS Tagging (TextBlob)")
+st.title("Instagram Post Analysis with POS Tagging")
 st.subheader("Top Nouns")
-st.dataframe(df_nouns.head(10))
+st.dataframe(df_nouns)
+
 st.subheader("Top Verbs")
-st.dataframe(df_verbs.head(10))
+st.dataframe(df_verbs)
+
 st.subheader("Top Adjectives")
-st.dataframe(df_adjectives.head(10))
+st.dataframe(df_adjectives)
+
+# Optional: Add interactivity
+selected_noun = st.selectbox("Select a Noun", df_nouns['Nouns'])
+st.write(f"You selected: {selected_noun}")
+
+selected_verb = st.selectbox("Select a Verb", df_verbs['Verbs'])
+st.write(f"You selected: {selected_verb}")
+
+selected_adjective = st.selectbox("Select an Adjective", df_adjectives['Adjectives'])
+st.write(f"You selected: {selected_adjective}")
