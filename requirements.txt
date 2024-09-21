@@ -1,5 +1,5 @@
-streamlit
-pandas
-openpyxl
-wordcloud
-
+streamlit==1.22.0
+pandas==1.5.3
+wordcloud==1.8.1
+matplotlib==3.7.1
+openpyxl==3.0.10
