@@ -1,20 +1,7 @@
-import spacy
+from textblob import TextBlob
 import pandas as pd
 import streamlit as st
 from collections import Counter
-import subprocess
-
-# Function to download the spaCy model
-def download_spacy_model():
-    try:
-        nlp = spacy.load("en_core_web_sm")
-    except OSError:
-        subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
-        nlp = spacy.load("en_core_web_sm")
-    return nlp
-
-# Download the spaCy English model dynamically
-nlp = download_spacy_model()
 
 # Load your Instagram post data
 data_file = 'lg_standbyme_posts.xlsx'
@@ -23,18 +10,18 @@ df = pd.read_excel(data_file)
 # Extract captions
 captions = df['Caption'].dropna().tolist()
 
-# Tokenize and POS tag the captions using spaCy
+# Tokenize and POS tag the captions using TextBlob
 nouns, verbs, adjectives = [], [], []
 
 for caption in captions:
-    doc = nlp(caption)
-    for token in doc:
-        if token.pos_ == "NOUN":
-            nouns.append(token.text)
-        elif token.pos_ == "VERB":
-            verbs.append(token.text)
-        elif token.pos_ == "ADJ":
-            adjectives.append(token.text)
+    blob = TextBlob(caption)
+    for word, pos in blob.tags:
+        if pos.startswith("NN"):  # Nouns
+            nouns.append(word)
+        elif pos.startswith("VB"):  # Verbs
+            verbs.append(word)
+        elif pos.startswith("JJ"):  # Adjectives
+            adjectives.append(word)
 
 # Count frequencies of nouns, verbs, and adjectives
 noun_counts = Counter(nouns)
@@ -47,7 +34,7 @@ df_verbs = pd.DataFrame(verb_counts.items(), columns=['Verb', 'Count']).sort_val
 df_adjectives = pd.DataFrame(adjective_counts.items(), columns=['Adjective', 'Count']).sort_values(by='Count', ascending=False)
 
 # Streamlit Display
-st.title("Instagram Post Analysis with POS Tagging (spaCy)")
+st.title("Instagram Post Analysis with POS Tagging (TextBlob)")
 st.subheader("Top Nouns")
 st.dataframe(df_nouns.head(10))
 st.subheader("Top Verbs")
