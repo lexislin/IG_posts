@@ -1,60 +1,46 @@
-import streamlit as st
-import pandas as pd
-from wordcloud import WordCloud
-import matplotlib.pyplot as plt
+import nltk
 from collections import Counter
-import re
+import pandas as pd
+import streamlit as st
 
-# Load the data
+# Make sure to download necessary nltk data first
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+
+# Load your Instagram post data
 data_file = 'lg_standbyme_posts.xlsx'
 df = pd.read_excel(data_file)
 
-# App title
-st.title("Instagram Post Analysis")
+# Extract captions
+captions = df['Caption'].dropna().tolist()
 
-# Display the DataFrame
-st.subheader("Posts Data")
-st.dataframe(df)
+# Tokenize and POS tag the captions
+tokens = []
+for caption in captions:
+    words = nltk.word_tokenize(caption)
+    tagged = nltk.pos_tag(words)
+    tokens.extend(tagged)
 
-# Function to clean the text (remove hashtags and certain terms)
-def clean_text(text, stopwords):
-    # Remove hashtags
-    text = re.sub(r'#\w+', '', text)
-    # Remove special characters and extra spaces
-    text = re.sub(r'[\n\r]+', ' ', text)
-    text = re.sub(r'\s+', ' ', text).strip()
-    
-    # Remove specific stopwords (e.g., product names, brand terms)
-    for stopword in stopwords:
-        text = text.replace(stopword, '')
-    
-    return text
+# Separate tokens into nouns, verbs, and adjectives
+nouns = [word for word, pos in tokens if pos.startswith('NN')]
+verbs = [word for word, pos in tokens if pos.startswith('VB')]
+adjectives = [word for word, pos in tokens if pos.startswith('JJ')]
 
-# Define words to remove (stopwords)
-stopwords = ['StanbyME Go', 'LG', 'LGTV', 'personalscreen', 'lifestylescreen', 'Take a moment', 'Turntable', 'wallpaper']
+# Count frequencies of nouns, verbs, and adjectives
+noun_counts = Counter(nouns)
+verb_counts = Counter(verbs)
+adjective_counts = Counter(adjectives)
 
-# Combine all captions into a single string after cleaning them
-all_captions = ' '.join(df['Caption'].apply(lambda x: clean_text(x, stopwords)))
+# Convert to DataFrame for easier handling and display
+df_nouns = pd.DataFrame(noun_counts.items(), columns=['Noun', 'Count']).sort_values(by='Count', ascending=False)
+df_verbs = pd.DataFrame(verb_counts.items(), columns=['Verb', 'Count']).sort_values(by='Count', ascending=False)
+df_adjectives = pd.DataFrame(adjective_counts.items(), columns=['Adjective', 'Count']).sort_values(by='Count', ascending=False)
 
-# Generate word cloud
-wordcloud = WordCloud(width=800, height=400, background_color='white').generate(all_captions)
-
-# Display the word cloud
-st.subheader("Word Cloud")
-plt.figure(figsize=(10, 5))
-plt.imshow(wordcloud, interpolation='bilinear')
-plt.axis('off')
-st.pyplot(plt)
-
-# Split the cleaned text into words
-words = all_captions.split()
-
-# Count word frequencies
-word_counts = Counter(words)
-
-# Convert to a DataFrame for easier display
-word_freq_df = pd.DataFrame(word_counts.items(), columns=['Keyword', 'Frequency']).sort_values(by='Frequency', ascending=False)
-
-# Display the top keywords and their frequencies
-st.subheader("Top Keywords")
-st.dataframe(word_freq_df.head(20))  # Display top 20 keywords
+# Streamlit Display
+st.title("Instagram Post Analysis with POS Tagging")
+st.subheader("Top Nouns")
+st.dataframe(df_nouns.head(10))
+st.subheader("Top Verbs")
+st.dataframe(df_verbs.head(10))
+st.subheader("Top Adjectives")
+st.dataframe(df_adjectives.head(10))
