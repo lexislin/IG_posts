@@ -16,13 +16,30 @@ option = st.selectbox("Select the type of chart to display:", ['Top Nouns', 'Top
 
 if option == 'Top Nouns':
     st.subheader("Top Nouns")
-    st.bar_chart(df_nouns.set_index('Nouns')['Count'])
+    plt.figure(figsize=(10, 6))
+    plt.barh(df_nouns['Nouns'][:10], df_nouns['Count'][:10], color='skyblue')
+    plt.xlabel('Count')
+    plt.ylabel('Nouns')
+    plt.title('Top Nouns')
+    st.pyplot(plt)
+    
 elif option == 'Top Verbs':
     st.subheader("Top Verbs")
-    st.bar_chart(df_verbs.set_index('Verbs')['Count'])
+    plt.figure(figsize=(10, 6))
+    plt.barh(df_verbs['Verbs'][:10], df_verbs['Count'][:10], color='salmon')
+    plt.xlabel('Count')
+    plt.ylabel('Verbs')
+    plt.title('Top Verbs')
+    st.pyplot(plt)
+    
 elif option == 'Top Adjectives':
     st.subheader("Top Adjectives")
-    st.bar_chart(df_adjectives.set_index('Adjectives')['Count'])
+    plt.figure(figsize=(10, 6))
+    plt.barh(df_adjectives['Adjectives'][:10], df_adjectives['Count'][:10], color='lightgreen')
+    plt.xlabel('Count')
+    plt.ylabel('Adjectives')
+    plt.title('Top Adjectives')
+    st.pyplot(plt)
 
 # Display the underlying data in a table
 st.subheader("Data Table")
