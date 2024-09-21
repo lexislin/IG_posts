@@ -13,7 +13,7 @@ df_adjectives = pd.read_excel(data_file, sheet_name='Adjectives')
 
 # Load all captions from the original data source
 captions_file = 'lg_standbyme_posts.xlsx'
-df_captions = pd.read_excel(captions_file, sheet_name='Sheet 1')
+df_captions = pd.read_excel(captions_file, sheet_name='Sheet1')
 captions = df_captions['Caption'].dropna().tolist()
 
 # Function to clean the text data
